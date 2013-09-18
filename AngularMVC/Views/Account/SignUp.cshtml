@@ -1,0 +1,85 @@
+﻿@{
+    Layout = null;
+}
+@functions{
+    public string GetAntiForgeryToken()
+    {
+        string cookieToken, formToken;
+        AntiForgery.GetTokens(null, out cookieToken, out formToken);
+        return cookieToken + ":" + formToken;                
+    }
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>SignUp</title>
+    <style type="text/css">
+        label
+       {           
+           display:block;
+       }
+        /*input.ng-invalid.ng-dirty
+        {
+            background-color: #FA787E;
+        }
+
+        input.ng-valid.ng-dirty
+        {
+            background-color: #78FA89;
+        }*/
+
+        .invalid,.error
+        {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+    <script src="~/Scripts/jquery-1.8.2.min.js"></script>
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/SignUpController.js"></script>
+</head>
+<body style="text-align:center;padding:0 auto">
+  
+    <h2>Visit <a href="http://techbrij.com" style="font-style:italic;text-decoration:none">TechBrij.com</a> for more information...</h2>
+      <div style="text-align:left;width:200px;margin:0 auto">
+
+    <div data-ng-app="validation">
+        <form name="mainForm" data-ng-submit="sendForm()" data-ng-controller="SignUpController" novalidate>       
+            <input id="antiForgeryToken" data-ng-model="antiForgeryToken" type="hidden" data-ng-init="antiForgeryToken='@GetAntiForgeryToken()'"  />        
+            <div>
+                <label for="userName">User Name</label>
+                <input id="userName" name="userName" type="text" data-ng-model="person.UserName" data-ng-pattern="/^[a-zA-Z0-9]{4,10}$/" 
+                    ng-unique required />
+                <span class="error" data-ng-show="mainForm.userName.$error.required">*</span>
+                <span class="error" data-ng-show="mainForm.userName.$error.pattern">Invalid user name.</span>
+                <span class="error" data-ng-show="mainForm.userName.$error.unique">Username already exists.</span>
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" data-ng-model="person.Password" data-ng-minlength="6" required />
+                <span class="error" data-ng-show="mainForm.password.$error.required">*</span>
+                <span class="error" data-ng-show="mainForm.password.$error.minlength">Minimum 6 characters are required.</span>
+            </div>
+            <div>
+                <label for="confirmPassword">Confirm Password</label>
+                <input id="confirmPassword" name="confirmPassword" type="password" data-ng-model="person.ConfirmPassword" required />
+                <span class="error" data-ng-show="mainForm.password.$error.required">*</span>
+                <span class="error" data-ng-show="(mainForm.password.$dirty && mainForm.confirmPassword.$dirty) && (person.Password != person.ConfirmPassword)">Password mismatched</span>
+            </div>
+            <div>
+                <input type="checkbox" data-ng-model="agreedToTerms" name="agreedToTerms" id="agreedToTerms" required />
+                <label for="agreedToTerms" style="display:inline">I agree to the terms</label>
+                <span class="error" data-ng-show="mainForm.agreedToTerms.$error.required">*</span>
+            </div>            
+            <div>
+                <button type="submit"  data-ng-disabled="mainForm.$invalid" >Submit</button>
+            </div>
+            <div id="errorMessages" class="error">{{message}}</div>   
+        </form>
+    </div>
+
+</div>
+</body>
+</html>
